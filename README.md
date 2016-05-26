@@ -12,6 +12,11 @@ Add the following to `project/plugins.sbt`
 
     addSbtPlugin("com.dwolla.sbt" % "sbt-cloudformation-stack" % "{version-number}")
 
+    resolvers ++= Seq(
+      Resolver.bintrayIvyRepo("dwolla", "sbt-plugins"),
+      Resolver.bintrayIvyRepo("dwolla", "maven")
+    )
+
 Then, enable the plugin by adding something like the following to `build.sbt`:
 
     val app = (project in file(".")).enablePlugins(CloudFormationStack)
@@ -29,6 +34,11 @@ Name of the stack. Defaults the normalized name of the project.
 ### `stackParameters`
 
 List of key-value pairs that will be provided to the stack as parameters. These can accept task or setting values; e.g., S3 bucket and keys from the [S3 Publisher](https://github.com/Dwolla/sbt-s3-publisher) plugin.
+
+    stackParameters ++= List(
+      "S3Bucket" → s3Bucket.value,
+      "S3Key" → s3Key.value
+    )
 
 ## Tasks
 
