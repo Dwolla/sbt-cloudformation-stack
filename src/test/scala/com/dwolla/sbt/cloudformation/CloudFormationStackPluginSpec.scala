@@ -73,9 +73,10 @@ class CloudFormationStackPluginSpec extends Specification with Mockito with With
       val stackName = "project"
       val input = "template"
       val params = List("param1" → "value1")
-      val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params) returns Future.successful("stack-id"))
+      val roleArn = Option("role-arn")
+      val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn) returns Future.successful("stack-id"))
 
-      val output = testClass.deployStack(stackName, input, params, client)
+      val output = testClass.deployStack(stackName, input, params, roleArn, client)
 
       output must_== "stack-id"
     }
