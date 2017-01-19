@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 
 class CloudFormationStackPlugin(environment: Environment = SystemEnvironment) {
   val defaultStackParameters = List.empty[(String, String)]
-  val defaultTemplateJsonFilename: String = "cloudformation-template.json"
+  val defaultTemplateJsonFilename = "cloudformation-template.json"
 
   def runStackTemplateBuilder(maybeMainClass: Option[String], outputFile: File, scalaRun: ScalaRun, classpath: Seq[Attributed[File]], streams: TaskStreams): File = {
     maybeMainClass.fold(throw new NoMainClassDetectedException) { mainClass ⇒
@@ -21,8 +21,8 @@ class CloudFormationStackPlugin(environment: Environment = SystemEnvironment) {
     }
   }
 
-  def deployStack(projectName: String, input: String, params: List[(String, String)], client: CloudFormationClient): String =
-    Await.result(client.createOrUpdateTemplate(projectName, input, params), Duration.Inf)
+  def deployStack(projectName: String, input: String, params: List[(String, String)], roleArn: Option[String], client: CloudFormationClient): String =
+    Await.result(client.createOrUpdateTemplate(projectName, input, params, roleArn), Duration.Inf)
 }
 
 class NoMainClassDetectedException extends RuntimeException("No main class detected.")

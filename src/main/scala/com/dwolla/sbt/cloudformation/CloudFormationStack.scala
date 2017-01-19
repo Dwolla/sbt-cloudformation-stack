@@ -16,20 +16,18 @@ object CloudFormationStack extends AutoPlugin {
   lazy val plugin = new CloudFormationStackPlugin
 
   lazy val defaultValues = Seq(
-    scalaVersion := "2.11.8",
     templateJsonFilename := plugin.defaultTemplateJsonFilename,
     templateJson := target.value / templateJsonFilename.value,
     stackParameters := plugin.defaultStackParameters,
     cloudformationClient := CloudFormationClient(),
-    stackName := normalizedName.value
+    stackName := normalizedName.value,
+    stackRoleArn := None
   )
 
   lazy val tasks = Seq(
-    generateStack <<= Def.inputTask {
-      plugin.runStackTemplateBuilder((mainClass in run in Compile).value, templateJson.value, (runner in run).value, (fullClasspath in Runtime).value, streams.value)
-    },
+    generateStack := plugin.runStackTemplateBuilder((mainClass in run in Compile).value, templateJson.value, (runner in run).value, (fullClasspath in Runtime).value, streams.value),
     generatedStackFile := read(generateStack.toTask("").value, utf8),
-    deployStack <<= (stackName, generatedStackFile, stackParameters, cloudformationClient) map plugin.deployStack
+    deployStack := plugin.deployStack(stackName.value, generatedStackFile.value, stackParameters.value, stackRoleArn.value, cloudformationClient.value)
   )
 
   private lazy val generatedStackFile = taskKey[String]("generatedStackFile")
