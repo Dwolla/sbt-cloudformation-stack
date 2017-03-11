@@ -4,18 +4,18 @@ lazy val buildSettings = Seq(
   homepage := Some(url("https://github.com/Dwolla/sbt-cloudformation-stack")),
   description := "SBT plugin to deploy projects using CloudFormation",
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  version := "1.0.0",
+  version := "1.1.0",
   scalaVersion := "2.10.6",
   sbtPlugin := true,
   startYear := Option(2016),
   resolvers += Resolver.bintrayIvyRepo("dwolla", "maven"),
   libraryDependencies ++= {
-    val awsSdkVersion = "1.11.75"
+    val awsSdkVersion = "1.11.104"
     val specs2Version = "3.8.6"
     Seq(
       "com.amazonaws"   %  "aws-java-sdk-cloudformation"  % awsSdkVersion,
       "ch.qos.logback"  %  "logback-classic"              % "1.1.7",
-      "com.dwolla"      %% "scala-aws-utils"              % "1.1.0",
+      "com.dwolla"      %% "scala-aws-utils"              % "1.2.0",
       "org.specs2"      %% "specs2-core"                  % specs2Version  % "test",
       "org.specs2"      %% "specs2-mock"                  % specs2Version  % "test"
     )

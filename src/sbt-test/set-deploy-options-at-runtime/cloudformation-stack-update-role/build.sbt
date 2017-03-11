@@ -19,8 +19,8 @@ val app = (project in file("."))
 
 TaskKey[Unit]("check") := {
   val testResults = (executeTests in Test).value
-  val awsAccountIdValue: Option[String] = awsAccountId.value
-  val awsRoleNameValue: Option[String] = awsRoleName.value
+  val awsAccountIdValue = awsAccountId.value
+  val awsRoleNameValue = awsRoleName.value
   val stackId: String = deployStack.value
 
   val expectedStackId =
@@ -33,13 +33,13 @@ TaskKey[Unit]("check") := {
       |with parameters:
       |List()
       |
-      |with role ARN: None
+      |with role ARN: Some(arn:aws:iam::123456789012:role/wow)
       |""".stripMargin
 
   val tests = Seq(
     (testResults.overall == TestResult.Passed, "Tests must all have passed"),
-    (awsAccountIdValue.isEmpty, "Account ID was not provided, so it should be None"),
-    (awsRoleNameValue.isEmpty, "Role Name was not provided, so it should be None"),
+    (awsAccountIdValue == Option("123456789012"), s"AWS Account ID must match expected value. got:\n$awsAccountIdValue\nexpected:\nSome(123456789012)"),
+    (awsRoleNameValue == Option("wow"), s"AWS Account ID must match expected value. got:\n$awsRoleNameValue\nexpected:\nSome(wow)"),
     (stackId == expectedStackId, s"stack ID must match FakeCloudFormationClient template. got:\n${stackId.replace(" ", ".")}\nexpected:\n${expectedStackId.replace(" ", ".")}")
   )
 

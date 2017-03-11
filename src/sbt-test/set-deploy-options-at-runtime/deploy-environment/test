@@ -1,0 +1,4 @@
+> clean
+> withDeployParameters Admin
+> check
+$ exists target/cloudformation-template.json
