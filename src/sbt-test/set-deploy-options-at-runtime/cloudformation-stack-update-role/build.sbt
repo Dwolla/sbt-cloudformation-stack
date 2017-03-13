@@ -33,13 +33,13 @@ TaskKey[Unit]("check") := {
       |with parameters:
       |List()
       |
-      |with role ARN: Some(arn:aws:iam::123456789012:role/wow)
+      |with role ARN: Some(arn:aws:iam::123456789012:role/path/wow)
       |""".stripMargin
 
   val tests = Seq(
     (testResults.overall == TestResult.Passed, "Tests must all have passed"),
     (awsAccountIdValue == Option("123456789012"), s"AWS Account ID must match expected value. got:\n$awsAccountIdValue\nexpected:\nSome(123456789012)"),
-    (awsRoleNameValue == Option("wow"), s"AWS Account ID must match expected value. got:\n$awsRoleNameValue\nexpected:\nSome(wow)"),
+    (awsRoleNameValue == Option("path/wow"), s"AWS Account ID must match expected value. got:\n$awsRoleNameValue\nexpected:\nSome(path/wow)"),
     (stackId == expectedStackId, s"stack ID must match FakeCloudFormationClient template. got:\n${stackId.replace(" ", ".")}\nexpected:\n${expectedStackId.replace(" ", ".")}")
   )
 
