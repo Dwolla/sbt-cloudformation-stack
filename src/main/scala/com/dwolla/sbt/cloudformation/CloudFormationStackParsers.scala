@@ -7,7 +7,7 @@ import sbt.{Project, State}
 
 object CloudFormationStackParsers {
   val awsAccountIdParser: Parser[AwsAccountId] = charClass(_.isDigit, "digit").+.map(_.mkString).filter(_.length == 12, s ⇒ s"`$s` is not a 12-digit AWS Account ID").map(AwsAccountId)
-  val awsRoleNameParser: Parser[AwsRoleName] = ("role/" ~> (charClass(_.isLetterOrDigit, "alphanumeric") | chars("+=,.@_-")).+.map(_.mkString)).map(AwsRoleName)
+  val awsRoleNameParser: Parser[AwsRoleName] = ("role/" ~> (charClass(_.isLetterOrDigit, "alphanumeric") | chars("+=,.@_-/")).+.map(_.mkString)).map(AwsRoleName)
 
   private def selectSome(items: Seq[(String, Parser[CloudFormationOption])]): Parser[Seq[CloudFormationOption]] = {
     def select1(items: Seq[Parser[CloudFormationOption]]): Parser[CloudFormationOption] = {

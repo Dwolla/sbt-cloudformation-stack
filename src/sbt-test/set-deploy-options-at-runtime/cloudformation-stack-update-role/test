@@ -1,4 +1,4 @@
 > clean
-> withDeployParameters role/wow 123456789012
+> withDeployParameters role/path/wow 123456789012
 > check
 $ exists target/cloudformation-template.json
