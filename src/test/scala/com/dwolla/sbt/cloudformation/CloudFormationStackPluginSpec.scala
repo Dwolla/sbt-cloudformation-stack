@@ -4,7 +4,6 @@ import java.io.File
 
 import com.dwolla.awssdk.cloudformation.CloudFormationClient
 import com.dwolla.testutils.WithBehaviorMocking
-import com.dwolla.util.Environment
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -15,15 +14,11 @@ import scala.concurrent.Future
 
 class CloudFormationStackPluginSpec extends Specification with Mockito with WithBehaviorMocking {
 
-  class Setup(environment: (String, String)*) extends Scope {
-    val testClass = new CloudFormationStackPlugin(FakeEnvironment(Map(environment: _*)))
+  class Setup extends Scope {
+    val testClass = new CloudFormationStackPlugin
 
     val log = mock[Logger]
     val streams = mock[TaskStreams] withBehavior (_.log returns log)
-  }
-
-  case class FakeEnvironment(map: Map[String, String]) extends Environment {
-    override def get(name: String): Option[String] = map.get(name)
   }
 
   "defaultTemplateJsonFilename" should {
@@ -73,12 +68,56 @@ class CloudFormationStackPluginSpec extends Specification with Mockito with With
       val stackName = "project"
       val input = "template"
       val params = List("param1" → "value1")
-      val roleArn = Option("role-arn")
+      val cloudFormationOptions = Seq(AwsAccountId("account-id"), AwsRoleName("role-name"))
+      val roleArn = Option("arn:aws:iam::account-id:role/role-name")
+      val deployEnvironment = None
+      val parameterName = "Environment"
       val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn) returns Future.successful("stack-id"))
 
-      val output = testClass.deployStack(stackName, input, params, roleArn, client)
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
 
       output must_== "stack-id"
+    }
+
+    "append an Environment parameter if set" in new Setup {
+      val stackName = "project"
+      val input = "template"
+      val params = List("param1" → "value1")
+      val cloudFormationOptions = Seq(AwsAccountId("account-id"), AwsRoleName("role-name"))
+      val roleArn = Option("arn:aws:iam::account-id:role/role-name")
+      val deployEnvironment = Option("Admin")
+      val parameterName = "Environment"
+      val client = mock[CloudFormationClient]
+
+      val parameterCaptor = capture[List[(String, String)]]
+
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]]) returns Future.successful("stack-id")
+
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
+
+      parameterCaptor.value must contain(parameterName → "Admin")
+      parameterCaptor.value must contain("param1" → "value1")
+    }
+
+    "replace an Environment parameter if set" in new Setup {
+      val stackName = "project"
+      val input = "template"
+      val parameterName = "Environment"
+      val params = List("param1" → "value1", parameterName → "NotAdmin")
+      val cloudFormationOptions = Seq(AwsAccountId("account-id"), AwsRoleName("role-name"))
+      val roleArn = Option("arn:aws:iam::account-id:role/role-name")
+      val deployEnvironment = Option("Admin")
+      val client = mock[CloudFormationClient]
+
+      val parameterCaptor = capture[List[(String, String)]]
+
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]]) returns Future.successful("stack-id")
+
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
+
+      parameterCaptor.value must contain(parameterName → "Admin")
+      parameterCaptor.value must not(contain(parameterName → "NotAdmin"))
+      parameterCaptor.value must contain("param1" → "value1")
     }
   }
 

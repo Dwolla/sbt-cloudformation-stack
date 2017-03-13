@@ -13,7 +13,14 @@ trait CloudFormationStackKeys {
   lazy val stackName = SettingKey[String]("stackName", "Name of the stack to deploy")
   lazy val templateJson = SettingKey[File]("templateJson", "File location where the CloudFormation stack template will be output")
   lazy val templateJsonFilename = settingKey[String]("Filename where the CloudFormation stack template will be output")
-  lazy val stackRoleArn = SettingKey[Option[String]]("stackRoleArn", "Optional Role ARN used by CloudFormation to execute the changes required by the stack")
+
+  lazy val awsAccountId = settingKey[Option[String]]("Optional Account ID used to help populate the Stack Role ARN")
+  lazy val awsRoleName = settingKey[Option[String]]("Optional role name used to help populate the Stack Role ARN")
+  lazy val stackRoleArn = settingKey[Option[String]]("Optional Role ARN used by CloudFormation to execute the changes required by the stack")
+
+  lazy val deployEnvironment = settingKey[Option[String]]("Environment into which the stack is being deployed")
+  lazy val deployEnvironmentParameterName = settingKey[String]("CloudFormation parameter name for the deploy environment")
+  lazy val deployEnvironmentOptions = settingKey[Seq[String]]("allowed options for the Environment into which the stack can be deployed")
 
   lazy val cloudformationClient = settingKey[CloudFormationClient]("cloudformation client")
 }

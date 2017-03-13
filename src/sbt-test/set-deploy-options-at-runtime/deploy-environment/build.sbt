@@ -19,8 +19,7 @@ val app = (project in file("."))
 
 TaskKey[Unit]("check") := {
   val testResults = (executeTests in Test).value
-  val awsAccountIdValue: Option[String] = awsAccountId.value
-  val awsRoleNameValue: Option[String] = awsRoleName.value
+  val environmentValue = deployEnvironment.value
   val stackId: String = deployStack.value
 
   val expectedStackId =
@@ -31,15 +30,14 @@ TaskKey[Unit]("check") := {
       |}
       |
       |with parameters:
-      |List()
+      |List((Environment,Admin))
       |
       |with role ARN: None
       |""".stripMargin
 
   val tests = Seq(
     (testResults.overall == TestResult.Passed, "Tests must all have passed"),
-    (awsAccountIdValue.isEmpty, "Account ID was not provided, so it should be None"),
-    (awsRoleNameValue.isEmpty, "Role Name was not provided, so it should be None"),
+    (environmentValue == Option("Admin"), s"Deploy Environment must match expected value, which should be one of ${deployEnvironmentOptions.value}. got:\n$environmentValue\nexpected:\nSome(Admin)"),
     (stackId == expectedStackId, s"stack ID must match FakeCloudFormationClient template. got:\n${stackId.replace(" ", ".")}\nexpected:\n${expectedStackId.replace(" ", ".")}")
   )
 
