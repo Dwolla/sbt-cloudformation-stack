@@ -1,0 +1,3 @@
+> clean
+> check
+$ exists target/cloudformation-template.json

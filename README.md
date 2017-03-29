@@ -40,6 +40,10 @@ List of key-value pairs that will be provided to the stack as parameters. These 
       "S3Key" → s3Key.value
     )
 
+### `changeSetName`
+
+If supplied, CloudFormation will create a change set to allow stack creates or update to be evaluated before being completed.
+
 ## Tasks
 
 ### `generate`

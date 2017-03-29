@@ -31,6 +31,7 @@ class CloudFormationStackPlugin {
                   maybeRoleArn: Option[String],
                   deployEnvironment: Option[String],
                   deployEnvironmentParameterName: String,
+                  changeSetName: Option[String],
                   client: CloudFormationClient): String = {
 
     val paramsWithEnvironment = deployEnvironment.fold(params) { environment ⇒
@@ -39,7 +40,7 @@ class CloudFormationStackPlugin {
       }
     }
 
-    Await.result(client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn), Duration.Inf)
+    Await.result(client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn, changeSetName), Duration.Inf)
   }
 
   def roleArn(maybeAccountId: Option[String], maybeRoleName: Option[String]): Option[String] = for {

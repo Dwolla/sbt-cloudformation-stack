@@ -22,5 +22,6 @@ trait CloudFormationStackKeys {
   lazy val deployEnvironmentParameterName = settingKey[String]("CloudFormation parameter name for the deploy environment")
   lazy val deployEnvironmentOptions = settingKey[Seq[String]]("allowed options for the Environment into which the stack can be deployed")
 
+  lazy val changeSetName = settingKey[Option[String]]("if supplied, CloudFormation will create a change set to allow stack creates or updates to be evaluated before being completed")
   lazy val cloudformationClient = settingKey[CloudFormationClient]("cloudformation client")
 }

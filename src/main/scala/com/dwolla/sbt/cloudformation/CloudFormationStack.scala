@@ -21,6 +21,7 @@ object CloudFormationStack extends AutoPlugin {
     stackParameters := plugin.defaultStackParameters,
     cloudformationClient := CloudFormationClient(),
     stackName := normalizedName.value,
+    changeSetName := None,
     awsAccountId := None,
     awsRoleName := None,
     stackRoleArn := plugin.roleArn(awsAccountId.value, awsRoleName.value),
@@ -39,6 +40,7 @@ object CloudFormationStack extends AutoPlugin {
       stackRoleArn.value,
       deployEnvironment.value,
       deployEnvironmentParameterName.value,
+      changeSetName.value,
       cloudformationClient.value
     ),
     commands += plugin.parseSettings

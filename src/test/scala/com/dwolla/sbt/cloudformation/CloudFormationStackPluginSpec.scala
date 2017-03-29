@@ -72,9 +72,10 @@ class CloudFormationStackPluginSpec extends Specification with Mockito with With
       val roleArn = Option("arn:aws:iam::account-id:role/role-name")
       val deployEnvironment = None
       val parameterName = "Environment"
-      val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn) returns Future.successful("stack-id"))
+      val changeSetName = None
+      val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn, changeSetName) returns Future.successful("stack-id"))
 
-      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
       output must_== "stack-id"
     }
@@ -87,13 +88,14 @@ class CloudFormationStackPluginSpec extends Specification with Mockito with With
       val roleArn = Option("arn:aws:iam::account-id:role/role-name")
       val deployEnvironment = Option("Admin")
       val parameterName = "Environment"
+      val changeSetName = None
       val client = mock[CloudFormationClient]
 
       val parameterCaptor = capture[List[(String, String)]]
 
-      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]]) returns Future.successful("stack-id")
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns Future.successful("stack-id")
 
-      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
       parameterCaptor.value must contain(parameterName → "Admin")
       parameterCaptor.value must contain("param1" → "value1")
@@ -107,13 +109,14 @@ class CloudFormationStackPluginSpec extends Specification with Mockito with With
       val cloudFormationOptions = Seq(AwsAccountId("account-id"), AwsRoleName("role-name"))
       val roleArn = Option("arn:aws:iam::account-id:role/role-name")
       val deployEnvironment = Option("Admin")
+      val changeSetName = None
       val client = mock[CloudFormationClient]
 
       val parameterCaptor = capture[List[(String, String)]]
 
-      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]]) returns Future.successful("stack-id")
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns Future.successful("stack-id")
 
-      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, client)
+      val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
       parameterCaptor.value must contain(parameterName → "Admin")
       parameterCaptor.value must not(contain(parameterName → "NotAdmin"))
