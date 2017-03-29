@@ -13,14 +13,15 @@ libraryDependencies ++= {
 }
 
 cloudformationClient := FakeCloudFormationClient
+changeSetName := Option("change-set-name")
 
 val app = (project in file("."))
   .enablePlugins(CloudFormationStack)
 
 TaskKey[Unit]("check") := {
   val testResults = (executeTests in Test).value
-  val awsAccountIdValue = awsAccountId.value
-  val awsRoleNameValue = awsRoleName.value
+  val awsAccountIdValue: Option[String] = awsAccountId.value
+  val awsRoleNameValue: Option[String] = awsRoleName.value
   val stackId: String = deployStack.value
 
   val expectedStackId =
@@ -33,14 +34,14 @@ TaskKey[Unit]("check") := {
       |with parameters:
       |List()
       |
-      |with role ARN: Some(arn:aws:iam::123456789012:role/path/wow)
-      |change set name: None
+      |with role ARN: None
+      |change set name: Some(change-set-name)
       |""".stripMargin
 
   val tests = Seq(
     (testResults.overall == TestResult.Passed, "Tests must all have passed"),
-    (awsAccountIdValue == Option("123456789012"), s"AWS Account ID must match expected value. got:\n$awsAccountIdValue\nexpected:\nSome(123456789012)"),
-    (awsRoleNameValue == Option("path/wow"), s"AWS Account ID must match expected value. got:\n$awsRoleNameValue\nexpected:\nSome(path/wow)"),
+    (awsAccountIdValue.isEmpty, "Account ID was not provided, so it should be None"),
+    (awsRoleNameValue.isEmpty, "Role Name was not provided, so it should be None"),
     (stackId == expectedStackId, s"stack ID must match FakeCloudFormationClient template. got:\n${stackId.replace(" ", ".")}\nexpected:\n${expectedStackId.replace(" ", ".")}")
   )
 

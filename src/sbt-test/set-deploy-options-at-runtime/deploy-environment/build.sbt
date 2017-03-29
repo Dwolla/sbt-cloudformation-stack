@@ -33,6 +33,7 @@ TaskKey[Unit]("check") := {
       |List((Environment,Admin))
       |
       |with role ARN: None
+      |change set name: None
       |""".stripMargin
 
   val tests = Seq(

@@ -4,7 +4,7 @@ lazy val buildSettings = Seq(
   homepage := Some(url("https://github.com/Dwolla/sbt-cloudformation-stack")),
   description := "SBT plugin to deploy projects using CloudFormation",
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  version := "1.1.1",
+  version := "1.2.0",
   scalaVersion := "2.10.6",
   sbtPlugin := true,
   startYear := Option(2016),
@@ -15,9 +15,9 @@ lazy val buildSettings = Seq(
     Seq(
       "com.amazonaws"   %  "aws-java-sdk-cloudformation"  % awsSdkVersion,
       "ch.qos.logback"  %  "logback-classic"              % "1.1.7",
-      "com.dwolla"      %% "scala-aws-utils"              % "1.2.0",
-      "org.specs2"      %% "specs2-core"                  % specs2Version  % "test",
-      "org.specs2"      %% "specs2-mock"                  % specs2Version  % "test"
+      "com.dwolla"      %% "scala-aws-utils"              % "1.3.0",
+      "org.specs2"      %% "specs2-core"                  % specs2Version % Test,
+      "org.specs2"      %% "specs2-mock"                  % specs2Version % Test
     )
   }
 )

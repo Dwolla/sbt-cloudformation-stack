@@ -7,7 +7,8 @@ object FakeCloudFormationClient extends CloudFormationClient {
   override def createOrUpdateTemplate(stackName: String,
                                       template: String,
                                       params: List[(String, String)],
-                                      roleArn: Option[String] = None): Future[StackID] = Future.successful(
+                                      roleArn: Option[String] = None,
+                                      changeSetName: Option[String] = None): Future[StackID] = Future.successful(
     s"""$stackName:
        |
        |$template
@@ -16,6 +17,7 @@ object FakeCloudFormationClient extends CloudFormationClient {
        |$params
        |
        |with role ARN: $roleArn
+       |change set name: $changeSetName
        |""".stripMargin
   )
 }
