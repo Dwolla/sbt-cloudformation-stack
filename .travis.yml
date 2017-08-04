@@ -1,9 +1,24 @@
 language: scala
 
-scala:
-  - 2.10.6
-
 script: sbt ++$TRAVIS_SCALA_VERSION pipeline
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
+matrix:
+  include:
+  - env: SBT_VERSION="0.13.16"
+    jdk: openjdk7
+  - env: SBT_VERSION="1.0.0-RC3"
+    jdk: oraclejdk8
+script:
+  - sbt "^^${SBT_VERSION}" pipeline
 
 before_deploy:
   - mkdir -p $HOME/.bintray
@@ -11,9 +26,6 @@ before_deploy:
 
 deploy:
   provider: script
-  script: sbt ++$TRAVIS_SCALA_VERSION publish
+  script: sbt "^^${SBT_VERSION}" publish
   on:
     branch: master
-
-jdk:
-  - oraclejdk8

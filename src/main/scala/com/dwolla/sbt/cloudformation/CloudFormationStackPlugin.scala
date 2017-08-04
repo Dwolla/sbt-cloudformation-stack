@@ -4,14 +4,16 @@ import com.dwolla.awssdk.cloudformation.CloudFormationClient
 import com.dwolla.sbt.cloudformation.CloudFormationStack.autoImport._
 import com.dwolla.sbt.cloudformation.CloudFormationStack.plugin
 import com.dwolla.sbt.cloudformation.CloudFormationStackParsers.buildCloudFormationStackParser
+import com.dwolla.sbt.cloudformation.SbtCompat.crossSbtCompatibility
 import sbt.Attributed._
 import sbt.Keys._
 import sbt.{File, _}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import scala.language.reflectiveCalls
+import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
+import scala.util.Try
 
 class CloudFormationStackPlugin {
   val defaultStackParameters = List.empty[(String, String)]
@@ -19,7 +21,7 @@ class CloudFormationStackPlugin {
 
   def runStackTemplateBuilder(maybeMainClass: Option[String], outputFile: File, scalaRun: ScalaRun, classpath: Seq[Attributed[File]], streams: TaskStreams): File = {
     maybeMainClass.fold(throw new NoMainClassDetectedException) { mainClass ⇒
-      toError(scalaRun.run(mainClass, data(classpath), Seq(outputFile.getCanonicalPath), streams.log))
+      crossSbtCompatibility(scalaRun.run(mainClass, data(classpath), Seq(outputFile.getCanonicalPath), streams.log)).failed.foreach(sys error _.getMessage)
 
       outputFile
     }
@@ -69,3 +71,14 @@ class CloudFormationStackPlugin {
 }
 
 class NoMainClassDetectedException extends RuntimeException("No main class detected.")
+
+private object SbtCompat {
+  def crossSbtCompatibility(o: Option[String]): Try[Unit] = o match {
+    case None ⇒ Try {}
+    case Some(msg) ⇒ Try {
+      throw new RuntimeException(msg, null, true, false) {}
+    }
+  }
+
+  def crossSbtCompatibility(t: Try[Unit]): Try[Unit] = t
+}
