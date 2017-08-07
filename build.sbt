@@ -4,8 +4,6 @@ lazy val buildSettings = Seq(
   homepage := Some(url("https://github.com/Dwolla/sbt-cloudformation-stack")),
   description := "SBT plugin to deploy projects using CloudFormation",
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  version := "1.2.0",
-  scalaVersion := "2.10.6",
   sbtPlugin := true,
   startYear := Option(2016),
   resolvers += Resolver.bintrayIvyRepo("dwolla", "maven"),
@@ -19,6 +17,23 @@ lazy val buildSettings = Seq(
       "org.specs2"      %% "specs2-core"                  % specs2Version % Test,
       "org.specs2"      %% "specs2-mock"                  % specs2Version % Test
     )
+  },
+  crossSbtVersions := Vector("1.0.0-RC3", "0.13.16"),
+  releaseVersionBump := sbtrelease.Version.Bump.Minor,
+  releaseProcess --= {
+    import ReleaseTransformations._
+    Seq(runClean, runTest, publishArtifacts)
+  },
+  releaseCommitMessage := {
+    val pattern = ".*-SNAPSHOT$".r
+    val defaultValue = releaseCommitMessage.value
+    defaultValue match {
+      case pattern(_) ⇒
+        s"""$defaultValue
+           |
+           |[ci skip]""".stripMargin
+      case _ ⇒ defaultValue
+    }
   }
 )
 
