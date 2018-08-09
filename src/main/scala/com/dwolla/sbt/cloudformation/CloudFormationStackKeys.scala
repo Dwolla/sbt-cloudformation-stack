@@ -3,8 +3,6 @@ package com.dwolla.sbt.cloudformation
 import com.dwolla.awssdk.cloudformation.CloudFormationClient
 import sbt._
 
-import scala.language.postfixOps
-
 trait CloudFormationStackKeys {
   lazy val generateStack = InputKey[File]("generate")
   lazy val deployStack = TaskKey[String]("deploy")

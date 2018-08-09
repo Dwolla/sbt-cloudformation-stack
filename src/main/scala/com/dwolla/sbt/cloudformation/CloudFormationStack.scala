@@ -5,8 +5,6 @@ import sbt.IO.{read, utf8}
 import sbt.Keys._
 import sbt._
 
-import scala.language.{implicitConversions, postfixOps}
-
 object CloudFormationStack extends AutoPlugin {
 
   object autoImport extends CloudFormationStackKeys
