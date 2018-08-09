@@ -2,7 +2,7 @@ package com.dwolla.sbt.cloudformation
 
 import java.io.File
 
-import com.dwolla.awssdk.cloudformation.CloudFormationClient
+import cats.effect._
 import com.dwolla.testutils.WithBehaviorMocking
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -11,7 +11,6 @@ import sbt.Keys.TaskStreams
 import sbt.internal.util.ManagedLogger
 import sbt.{AttributeMap, Attributed, ScalaRun}
 
-import scala.concurrent.Future
 import scala.util.Try
 
 class SbtCloudFormationStackPluginSpec extends Specification with Mockito with WithBehaviorMocking {
@@ -45,7 +44,7 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
       val deployEnvironment = None
       val parameterName = "Environment"
       val changeSetName = None
-      val client = mock[CloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn, changeSetName) returns Future.successful("stack-id"))
+      val client = mock[IOCloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn, changeSetName) returns IO.pure("stack-id"))
 
       val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
@@ -61,11 +60,11 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
       val deployEnvironment = Option("Admin")
       val parameterName = "Environment"
       val changeSetName = None
-      val client = mock[CloudFormationClient]
+      val client = mock[IOCloudFormationClient]
 
       val parameterCaptor = capture[List[(String, String)]]
 
-      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns Future.successful("stack-id")
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns IO.pure("stack-id")
 
       val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
@@ -82,11 +81,11 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
       val roleArn = Option("arn:aws:iam::account-id:role/role-name")
       val deployEnvironment = Option("Admin")
       val changeSetName = None
-      val client = mock[CloudFormationClient]
+      val client = mock[IOCloudFormationClient]
 
       val parameterCaptor = capture[List[(String, String)]]
 
-      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns Future.successful("stack-id")
+      client.createOrUpdateTemplate(any[String], any[String], parameterCaptor.capture, any[Option[String]], any[Option[String]]) returns IO.pure("stack-id")
 
       val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 

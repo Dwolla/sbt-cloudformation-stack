@@ -1,6 +1,7 @@
 package com.dwolla.sbt.cloudformation
 
-import com.dwolla.awssdk.cloudformation.CloudFormationClient
+import cats.effect._
+import com.dwolla.fs2aws.cloudformation.CloudFormationClient
 import com.dwolla.sbt.cloudformation.CloudFormationStack.autoImport._
 import com.dwolla.sbt.cloudformation.CloudFormationStack.plugin
 import com.dwolla.sbt.cloudformation.CloudFormationStackParsers.buildCloudFormationStackParser
@@ -8,8 +9,6 @@ import sbt.Attributed._
 import sbt.Keys._
 import sbt.{File, _}
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 
 class CloudFormationStackPlugin {
@@ -31,7 +30,7 @@ class CloudFormationStackPlugin {
                   deployEnvironment: Option[String],
                   deployEnvironmentParameterName: String,
                   changeSetName: Option[String],
-                  client: CloudFormationClient): String = {
+                  client: CloudFormationClient[IO]): String = {
 
     val paramsWithEnvironment = deployEnvironment.fold(params) { environment ⇒
       (deployEnvironmentParameterName → environment) :: params.filterNot {
@@ -39,7 +38,8 @@ class CloudFormationStackPlugin {
       }
     }
 
-    Await.result(client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn, changeSetName), Duration.Inf)
+    client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn, changeSetName)
+      .unsafeRunSync()
   }
 
   def roleArn(maybeAccountId: Option[String], maybeRoleName: Option[String]): Option[String] = for {

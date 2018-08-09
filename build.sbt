@@ -12,7 +12,7 @@ lazy val buildSettings = Seq(
     val specs2Version = "4.3.0"
     Seq(
       "com.amazonaws"   %  "aws-java-sdk-cloudformation"  % awsSdkVersion,
-      "com.dwolla"      %% "scala-aws-utils"              % "1.6.1",
+      "com.dwolla"      %% "fs2-aws"                      % "1.1.0",
       "ch.qos.logback"  %  "logback-classic"              % "1.2.3",
       "org.specs2"      %% "specs2-core"                  % specs2Version % Test,
       "org.specs2"      %% "specs2-mock"                  % specs2Version % Test
