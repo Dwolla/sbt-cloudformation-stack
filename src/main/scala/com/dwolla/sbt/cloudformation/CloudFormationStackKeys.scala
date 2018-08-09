@@ -1,9 +1,6 @@
 package com.dwolla.sbt.cloudformation
 
-import com.dwolla.awssdk.cloudformation.CloudFormationClient
 import sbt._
-
-import scala.language.postfixOps
 
 trait CloudFormationStackKeys {
   lazy val generateStack = InputKey[File]("generate")
@@ -23,5 +20,10 @@ trait CloudFormationStackKeys {
   lazy val deployEnvironmentOptions = settingKey[Seq[String]]("allowed options for the Environment into which the stack can be deployed")
 
   lazy val changeSetName = settingKey[Option[String]]("if supplied, CloudFormation will create a change set to allow stack creates or updates to be evaluated before being completed")
-  lazy val cloudformationClient = settingKey[CloudFormationClient]("cloudformation client")
+
+  /**
+    * This is `IOCloudFormationClient` instead of `CloudFormationClient[IO]` because sbt's macros
+    * don't work with higher-kinded types. See https://github.com/sbt/sbt/issues/2188
+    */
+  lazy val cloudformationClient = settingKey[IOCloudFormationClient]("cloudformation client")
 }

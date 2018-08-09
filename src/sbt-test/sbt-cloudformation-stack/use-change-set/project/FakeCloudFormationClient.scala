@@ -1,14 +1,13 @@
-import com.dwolla.awssdk.cloudformation.CloudFormationClient
-import com.dwolla.awssdk.cloudformation.CloudFormationClient.StackID
+import cats.effect._
+import com.dwolla.fs2aws.cloudformation._
+import com.dwolla.sbt.cloudformation._
 
-import scala.concurrent.Future
-
-object FakeCloudFormationClient extends CloudFormationClient {
+object FakeCloudFormationClient extends IOCloudFormationClient {
   override def createOrUpdateTemplate(stackName: String,
                                       template: String,
                                       params: List[(String, String)],
                                       roleArn: Option[String] = None,
-                                      changeSetName: Option[String] = None): Future[StackID] = Future.successful(
+                                      changeSetName: Option[String] = None): IO[StackID] = IO.pure(
     s"""$stackName:
        |
        |$template

@@ -1,19 +1,15 @@
 package com.dwolla.sbt.cloudformation
 
-import com.dwolla.awssdk.cloudformation.CloudFormationClient
+import cats.effect._
+import com.dwolla.fs2aws.cloudformation.CloudFormationClient
 import com.dwolla.sbt.cloudformation.CloudFormationStack.autoImport._
 import com.dwolla.sbt.cloudformation.CloudFormationStack.plugin
 import com.dwolla.sbt.cloudformation.CloudFormationStackParsers.buildCloudFormationStackParser
-import com.dwolla.sbt.cloudformation.SbtCompat.crossSbtCompatibility
 import sbt.Attributed._
 import sbt.Keys._
 import sbt.{File, _}
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
-import scala.util.Try
 
 class CloudFormationStackPlugin {
   val defaultStackParameters = List.empty[(String, String)]
@@ -21,7 +17,7 @@ class CloudFormationStackPlugin {
 
   def runStackTemplateBuilder(maybeMainClass: Option[String], outputFile: File, scalaRun: ScalaRun, classpath: Seq[Attributed[File]], streams: TaskStreams): File = {
     maybeMainClass.fold(throw new NoMainClassDetectedException) { mainClass ⇒
-      crossSbtCompatibility(scalaRun.run(mainClass, data(classpath), Seq(outputFile.getCanonicalPath), streams.log)).failed.foreach(sys error _.getMessage)
+      scalaRun.run(mainClass, data(classpath), Seq(outputFile.getCanonicalPath), streams.log).failed.foreach(sys error _.getMessage)
 
       outputFile
     }
@@ -34,7 +30,7 @@ class CloudFormationStackPlugin {
                   deployEnvironment: Option[String],
                   deployEnvironmentParameterName: String,
                   changeSetName: Option[String],
-                  client: CloudFormationClient): String = {
+                  client: CloudFormationClient[IO]): String = {
 
     val paramsWithEnvironment = deployEnvironment.fold(params) { environment ⇒
       (deployEnvironmentParameterName → environment) :: params.filterNot {
@@ -42,7 +38,8 @@ class CloudFormationStackPlugin {
       }
     }
 
-    Await.result(client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn, changeSetName), Duration.Inf)
+    client.createOrUpdateTemplate(projectName, input, paramsWithEnvironment, maybeRoleArn, changeSetName)
+      .unsafeRunSync()
   }
 
   def roleArn(maybeAccountId: Option[String], maybeRoleName: Option[String]): Option[String] = for {
@@ -61,7 +58,7 @@ class CloudFormationStackPlugin {
     val maybeRoleName = plugin.find[AwsRoleName](options)
     val maybeRoleArn = plugin.roleArn(maybeAccountId, maybeRoleName)
 
-    extracted.append(Seq(
+    extracted.appendWithSession(Seq(
       awsAccountId := maybeAccountId,
       awsRoleName := maybeRoleName,
       deployEnvironment := plugin.find[Environment](options),
@@ -71,14 +68,3 @@ class CloudFormationStackPlugin {
 }
 
 class NoMainClassDetectedException extends RuntimeException("No main class detected.")
-
-private object SbtCompat {
-  def crossSbtCompatibility(o: Option[String]): Try[Unit] = o match {
-    case None ⇒ Try {}
-    case Some(msg) ⇒ Try {
-      throw new RuntimeException(msg, null, true, false) {}
-    }
-  }
-
-  def crossSbtCompatibility(t: Try[Unit]): Try[Unit] = t
-}
