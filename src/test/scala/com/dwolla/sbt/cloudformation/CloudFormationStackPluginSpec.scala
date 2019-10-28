@@ -19,7 +19,7 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
     val testClass = new CloudFormationStackPlugin
 
     val log = mock[ManagedLogger]
-    val streams = mock[TaskStreams] withBehavior (_.log returns log)
+    val streams = mock[TaskStreams] withBehavior { x => x.log returns log; () }
   }
 
   "defaultTemplateJsonFilename" should {
@@ -44,7 +44,7 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
       val deployEnvironment = None
       val parameterName = "Environment"
       val changeSetName = None
-      val client = mock[IOCloudFormationClient] withBehavior (_.createOrUpdateTemplate(stackName, input, params, roleArn, changeSetName) returns IO.pure("stack-id"))
+      val client = mock[IOCloudFormationClient] withBehavior { x => x.createOrUpdateTemplate(stackName, input, params, roleArn, changeSetName) returns IO.pure("stack-id"); ()}
 
       val output = testClass.deployStack(stackName, input, params, roleArn, deployEnvironment, parameterName, changeSetName, client)
 
@@ -97,7 +97,7 @@ class SbtCloudFormationStackPluginSpec extends Specification with Mockito with W
 
   "runStackTemplateBuilder" should {
     trait RunStackTemplateBuilderMocks { this: Setup ⇒
-      val outputFile = mock[File] withBehavior (_.getCanonicalPath returns "path")
+      val outputFile = mock[File] withBehavior { x => x.getCanonicalPath returns "path"; () }
       val scalaRun = mock[ScalaRun]
       val fileOnClasspath = mock[File]
       val attributedClasspath = Seq(Attributed(fileOnClasspath)(AttributeMap()))
