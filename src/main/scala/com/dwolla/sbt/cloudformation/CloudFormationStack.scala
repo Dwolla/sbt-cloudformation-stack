@@ -1,6 +1,6 @@
 package com.dwolla.sbt.cloudformation
 
-import sbt.IO.{read, utf8}
+import sbt.IO._
 import sbt.Keys._
 import sbt._
 
@@ -16,7 +16,8 @@ object CloudFormationStack extends AutoPlugin {
     templateJsonFilename := plugin.defaultTemplateJsonFilename,
     templateJson := target.value / templateJsonFilename.value,
     stackParameters := plugin.defaultStackParameters,
-    cloudformationClient := new IOCloudFormationClient(),
+    awsRegion := None,
+    cloudformationClient := new IOCloudFormationClient(awsRegion.value),
     stackName := normalizedName.value,
     changeSetName := None,
     awsAccountId := None,
