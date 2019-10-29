@@ -1,3 +1,5 @@
+resolvers += Resolver.bintrayRepo("dwolla", "maven")
+
 {
   val pluginVersion = System.getProperty("plugin.version")
   if(pluginVersion == null)

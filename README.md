@@ -14,7 +14,7 @@ Add the following to `project/plugins.sbt`
 
     resolvers ++= Seq(
       Resolver.bintrayIvyRepo("dwolla", "sbt-plugins"),
-      Resolver.bintrayIvyRepo("dwolla", "maven")
+      Resolver.bintrayRepo("dwolla", "maven")
     )
 
 Then, enable the plugin by adding something like the following to `build.sbt`:

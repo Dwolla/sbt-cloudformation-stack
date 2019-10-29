@@ -1,14 +1,11 @@
-import java.io.PrintWriter
-import java.nio.charset.Charset
-import java.io.File
-import resource._
+import java.io._
+import cats.effect._
 
-object Stack extends App {
-  for {
-    output ← managed(new PrintWriter(new File(args(0)), "utf8"))
-  } {
-    output.write(stack)
-  }
+object Stack extends IOApp {
+  override def run(args: List[String]): IO[ExitCode] =
+    Resource.fromAutoCloseable(IO(new PrintWriter(new File(args.head), "utf8")))
+      .use(output => IO(output.write(stack)))
+      .map(_ => ExitCode.Success)
 
   def stack: String =
     """{

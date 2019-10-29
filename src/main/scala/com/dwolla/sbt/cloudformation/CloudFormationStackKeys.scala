@@ -1,5 +1,6 @@
 package com.dwolla.sbt.cloudformation
 
+import com.amazonaws.regions.Regions
 import sbt._
 
 trait CloudFormationStackKeys {
@@ -13,6 +14,7 @@ trait CloudFormationStackKeys {
 
   lazy val awsAccountId = settingKey[Option[String]]("Optional Account ID used to help populate the Stack Role ARN")
   lazy val awsRoleName = settingKey[Option[String]]("Optional role name used to help populate the Stack Role ARN")
+  lazy val awsRegion = settingKey[Option[Regions]]("Region where the stack should be deployed")
   lazy val stackRoleArn = settingKey[Option[String]]("Optional Role ARN used by CloudFormation to execute the changes required by the stack")
 
   lazy val deployEnvironment = settingKey[Option[String]]("Environment into which the stack is being deployed")

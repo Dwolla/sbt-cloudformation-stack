@@ -1,13 +1,13 @@
 import scala.language.postfixOps
 
 name := "test-project"
-scalaVersion := "2.11.8"
+scalaVersion := "2.13.1"
 
 libraryDependencies ++= {
-  lazy val specs2Version = "3.7.2"
+  lazy val specs2Version = "4.8.0"
 
   Seq(
-    "com.jsuereth" %% "scala-arm" % "1.4",      // use scala-arm to prove we can pull in an arbitrary dependency into the stack code
+    "org.typelevel" %% "cats-effect" % "2.0.0",      // use to prove we can pull in an arbitrary dependency into the stack code
     "org.specs2" %% "specs2-core" % specs2Version % Test
   )
 }
