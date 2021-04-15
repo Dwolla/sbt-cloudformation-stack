@@ -29,7 +29,7 @@ object CloudFormationStack extends AutoPlugin {
   )
 
   lazy val tasks = Seq(
-    generateStack := plugin.runStackTemplateBuilder((mainClass in run in Compile).value, templateJson.value, (runner in run).value, (fullClasspath in Runtime).value, streams.value),
+    generateStack := plugin.runStackTemplateBuilder((Compile / run/ mainClass).value, templateJson.value, (run / runner).value, (Runtime / fullClasspath).value, streams.value),
     generatedStackFile := read(generateStack.toTask("").value, utf8),
     deployStack := plugin.deployStack(
       stackName.value,
