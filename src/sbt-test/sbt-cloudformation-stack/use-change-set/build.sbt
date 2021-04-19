@@ -19,7 +19,7 @@ val app = (project in file("."))
   .enablePlugins(CloudFormationStack)
 
 TaskKey[Unit]("check") := {
-  val testResults = (executeTests in Test).value
+  val testResults = (Test / executeTests).value
   val awsAccountIdValue: Option[String] = awsAccountId.value
   val awsRoleNameValue: Option[String] = awsRoleName.value
   val stackId: String = deployStack.value

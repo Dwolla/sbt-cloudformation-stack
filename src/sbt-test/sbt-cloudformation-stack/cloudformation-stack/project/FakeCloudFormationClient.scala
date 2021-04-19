@@ -2,7 +2,7 @@ import cats.effect._
 import com.dwolla.fs2aws.cloudformation._
 import com.dwolla.sbt.cloudformation._
 
-object FakeCloudFormationClient extends IOCloudFormationClient {
+object FakeCloudFormationClient extends IOCloudFormationClient(FakeAmazonCloudFormationAsync) {
   override def createOrUpdateTemplate(stackName: String,
                                       template: String,
                                       params: List[(String, String)],

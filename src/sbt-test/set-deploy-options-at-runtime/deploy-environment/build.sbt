@@ -18,7 +18,7 @@ val app = (project in file("."))
   .enablePlugins(CloudFormationStack)
 
 TaskKey[Unit]("check") := {
-  val testResults = (executeTests in Test).value
+  val testResults = (Test / executeTests).value
   val environmentValue = deployEnvironment.value
   val stackId: String = deployStack.value
 
